@@ -17,10 +17,10 @@
     "dev": "npx live-server .",
     "test": "node --test"
   },
-  "homepage": "https://github.com/<your-org>/codemagic-to-yaml",
+  "homepage": "https://github.com/John-Daniels/codemagic-to-yaml",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-org>/codemagic-to-yaml.git"
+    "url": "https://github.com/John-Daniels/codemagic-to-yaml.git"
   },
   "private": false,
   "devDependencies": {

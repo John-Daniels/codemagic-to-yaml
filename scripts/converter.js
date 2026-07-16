@@ -423,7 +423,7 @@
   function renderHeader(todos) {
     let h =
       "# Generated from Codemagic UI config by codemagic-to-yaml v" + VERSION + ".\n" +
-      "# https://github.com/<your-org>/codemagic-to-yaml\n" +
+      "# https://github.com/John-Daniels/codemagic-to-yaml\n" +
       "# Save as `codemagic.yaml` in your repo root.\n" +
       "# NOTE: secrets (passwords, uploaded keystores/keys, secure env values) are NOT in the\n" +
       "#       Codemagic API and cannot be exported. Resolve every TODO below before building.\n\n";

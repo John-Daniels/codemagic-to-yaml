@@ -116,7 +116,7 @@ PRs welcome — especially non-Flutter project types and additional publishers.
 ## Reporting an issue / a missing mapping
 
 Something converted wrong, or a field you use isn't handled? Open an issue at
-`https://github.com/<your-org>/codemagic-to-yaml/issues` with:
+`https://github.com/John-Daniels/codemagic-to-yaml/issues` with:
 
 1. **Your workflow JSON** — the `api.codemagic.io/apps/<id>` response — **with secrets redacted.**
    The tool never *outputs* secrets, but the input JSON can still contain non-secure values
