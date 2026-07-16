@@ -1,0 +1,29 @@
+{
+  "name": "codemagic-to-yaml",
+  "version": "1.0.0",
+  "description": "Export Codemagic UI-configured Flutter workflows to codemagic.yaml, right in your browser. Codemagic has no YAML export button — this converts the app config JSON for you.",
+  "keywords": [
+    "codemagic",
+    "codemagic.yaml",
+    "flutter",
+    "ci-cd",
+    "yaml",
+    "workflow",
+    "export",
+    "mobile"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx live-server .",
+    "test": "node --test"
+  },
+  "homepage": "https://github.com/<your-org>/codemagic-to-yaml",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-org>/codemagic-to-yaml.git"
+  },
+  "private": false,
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

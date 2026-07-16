@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>codemagic-to-yaml · Export Codemagic UI workflows to codemagic.yaml</title>
+
+    <!-- Discoverability -->
+    <meta name="description" content="Free browser tool to export Codemagic UI-configured Flutter workflows to codemagic.yaml. Codemagic has no YAML export button — this converts the app config JSON for you. Runs locally, nothing uploaded." />
+    <meta name="keywords" content="codemagic, codemagic.yaml, codemagic export yaml, flutter, ci/cd, yaml, workflow, mobile build, convert" />
+    <meta name="author" content="codemagic-to-yaml contributors" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="codemagic-to-yaml — export Codemagic UI workflows to codemagic.yaml" />
+    <meta property="og:description" content="Codemagic can't export UI workflows to YAML. Paste the app config JSON and download codemagic.yaml. Runs entirely in your browser." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="codemagic-to-yaml" />
+    <meta name="twitter:description" content="Export Codemagic UI-configured workflows to codemagic.yaml, in your browser." />
+
+    <link rel="icon" href="icon.svg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "media" };
+    </script>
+  </head>
+
+  <body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200">
+    <div class="mx-auto flex min-h-full max-w-6xl flex-col px-4 py-8">
+      <!-- Header -->
+      <header class="mb-6 flex flex-wrap items-center gap-3">
+        <img src="icon.svg" alt="" class="h-10 w-10 rounded-xl shadow-sm" />
+        <div class="mr-auto">
+          <h1 class="text-xl font-bold tracking-tight sm:text-2xl">codemagic-to-yaml</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Export Codemagic UI workflows to <code class="rounded bg-slate-200 px-1 dark:bg-slate-800">codemagic.yaml</code>
+          </p>
+        </div>
+        <span id="badge-version" class="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-900/50 dark:text-sky-300"></span>
+        <a href="https://github.com/<your-org>/codemagic-to-yaml" target="_blank" rel="noopener"
+           class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">
+          GitHub
+        </a>
+      </header>
+
+      <p class="mb-4 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        Codemagic has no “export workflow to YAML” button. In Codemagic, open
+        <strong>DevTools → Network</strong>, load your app, and copy the JSON response from
+        <code class="rounded bg-slate-200 px-1 dark:bg-slate-800">api.codemagic.io/apps/&lt;id&gt;</code>.
+        Paste it below → download <code class="rounded bg-slate-200 px-1 dark:bg-slate-800">codemagic.yaml</code>.
+        Everything runs in your browser — <strong>nothing is uploaded</strong>.
+      </p>
+
+      <div id="msg" class="mb-4 hidden"></div>
+
+      <!-- Workspace -->
+      <div class="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-2">
+        <!-- Input -->
+        <section class="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="mb-3 flex items-center gap-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-xs font-bold text-white">1</span>
+            <h2 class="font-semibold">Paste API JSON</h2>
+            <label class="ml-auto cursor-pointer rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">
+              Load file…
+              <input id="file" type="file" accept=".json,.txt,application/json" class="hidden" />
+            </label>
+          </div>
+          <textarea id="input"
+            class="min-h-[55vh] flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs leading-relaxed outline-none focus:border-sky-400 dark:border-slate-800 dark:bg-slate-950"
+            placeholder="Paste the api.codemagic.io/apps/… JSON here (or drop a .json file). Multiple concatenated objects — like a saved workflow.json — are fine."></textarea>
+        </section>
+
+        <!-- Output -->
+        <section class="flex flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="mb-3 flex flex-wrap items-center gap-2">
+            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-xs font-bold text-white">2</span>
+            <h2 class="font-semibold">Get codemagic.yaml</h2>
+            <div class="ml-auto flex gap-2">
+              <button id="convert" type="button"
+                class="rounded-lg bg-sky-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-sky-700">
+                Convert →
+              </button>
+              <button id="download" type="button" disabled
+                class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800">
+                Download
+              </button>
+              <button id="copy" type="button" disabled
+                class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800">
+                Copy
+              </button>
+            </div>
+          </div>
+          <pre id="output"
+            class="min-h-[55vh] flex-1 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs leading-relaxed dark:border-slate-800 dark:bg-slate-950"></pre>
+        </section>
+      </div>
+
+      <!-- References -->
+      <details class="mt-6 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <summary class="cursor-pointer font-semibold">Codemagic references &amp; field mapping</summary>
+        <p class="mt-3 text-slate-600 dark:text-slate-300">
+          Each part of the generated file maps to a documented Codemagic YAML section:
+        </p>
+        <ul class="mt-2 grid gap-1.5 sm:grid-cols-2">
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml/yaml-getting-started/">YAML getting started (instance_type, environment, triggering, scripts, artifacts)</a></li>
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml-quick-start/building-a-flutter-app/">Building a Flutter app</a></li>
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml-code-signing/signing-android/">Android code signing → <code>android_signing</code></a></li>
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml-code-signing/signing-ios/">iOS code signing → <code>ios_signing</code></a></li>
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml-publishing/google-play/">Google Play publishing → <code>google_play</code></a></li>
+          <li><a class="text-sky-600 hover:underline dark:text-sky-400" target="_blank" rel="noopener" href="https://docs.codemagic.io/yaml-publishing/app-store-connect/">App Store Connect publishing → <code>app_store_connect</code></a></li>
+        </ul>
+        <p class="mt-3 text-slate-500 dark:text-slate-400">
+          <strong>Note:</strong> secrets (passwords, uploaded keystores/keys, secure env values) are never
+          returned by the API and can’t be exported. The output references them by name with a
+          <code>TODO</code> list at the top — re-add each once in the Codemagic UI.
+        </p>
+      </details>
+
+      <footer class="mt-6 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <span id="version"></span>
+        <span>·</span>
+        <span>MIT License</span>
+        <span>·</span>
+        <a class="hover:underline" href="https://github.com/<your-org>/codemagic-to-yaml" target="_blank" rel="noopener">Contribute on GitHub</a>
+      </footer>
+    </div>
+
+    <script src="scripts/converter.js"></script>
+    <script src="scripts/main.js"></script>
+    <script>
+      // mirror version into the header badge
+      document.getElementById("badge-version").textContent = "v" + window.CodemagicConverter.VERSION;
+    </script>
+  </body>
+</html>
